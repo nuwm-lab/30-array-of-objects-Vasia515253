@@ -51,6 +51,8 @@ namespace LabWork
         }
     }
 
+    //coment
+
     class Result
     {
         public static void Run()
