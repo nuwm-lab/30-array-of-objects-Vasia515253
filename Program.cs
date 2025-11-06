@@ -5,7 +5,7 @@ namespace LabWork
     // Клас для геометричної прогресії
     class GeometricProgression
     {
-        private double a0; // перший член
+        private double a0; // перший член 123
         private double q;  // знаменник
         private int n;     // кількість членів
 
