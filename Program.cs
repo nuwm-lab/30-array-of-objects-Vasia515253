@@ -2,95 +2,94 @@ using System;
 
 namespace LabWork
 {
-    // Клас для геометричної прогресії
-    class GeometricProgression
+    class ArithmeticProgression
     {
-        private double a0; // перший член 123
-        private double q;  // знаменник
-        private int n;     // кількість членів
+        // Поля закриті — інкапсуляція
+        private double a0;
+        private double d;
+        private int n;
 
-        public GeometricProgression(double a0, double q, int n)
+        public double A0
         {
-            this.a0 = a0;
-            this.q = q;
-            this.n = n;
+            get { return a0; }
+            private set { a0 = value; }
         }
 
-        // Властивості (інкапсуляція)
-        public double A0 => a0;
-        public double Q => q;
-        public int N => n;
-
-        // Метод для знаходження останнього члена прогресії
-        public double LastTerm()
+        public double D
         {
-            return a0 * Math.Pow(q, n - 1);
+            get { return d; }
+            private set { d = value; }
         }
 
-        // Метод для знаходження суми прогресії
-        public double Sum()
+        public int N
         {
-            if (q == 1)
-                return a0 * n;
-            else
-                return a0 * (Math.Pow(q, n) - 1) / (q - 1);
+            get { return n; }
+            private set 
+            { 
+                if (value <= 0)
+                    throw new ArgumentException("Кількість членів має бути > 0");
+                n = value; 
+            }
         }
 
-        // Метод перевіряє, чи є останній член найбільшим у прогресії
-        public bool HasLargestLastTerm()
+        // Конструктор
+        public ArithmeticProgression(double a0, double d, int n)
         {
-            if (q > 1 && a0 > 0) return true;   // зростаюча прогресія
-            if (q < 1 && a0 < 0) return true;   // спадна з від’ємними членами
-            return false;
+            A0 = a0;
+            D = d;
+            N = n;
         }
 
-        // Метод для гарного виведення інформації
+        // Метод для суми прогресії
+        public double GetSum()
+        {
+            return (2 * a0 + d * (n - 1)) * n / 2.0;
+        }
+
         public override string ToString()
         {
-            return $"a₀ = {a0}, q = {q}, n = {n}, Last = {LastTerm():F2}";
+            return $"a0={a0}, d={d}, n={n}, Sum={GetSum()}";
         }
     }
 
-    //coment
-
     class Result
     {
-        public static void Run()
+        public void Run()
         {
-            Console.Write("Введіть кількість прогресій n: ");
-            int n = int.Parse(Console.ReadLine());
+            Console.Write("Введіть кількість прогресій: ");
+            int count = int.Parse(Console.ReadLine());
 
-            GeometricProgression[] arr = new GeometricProgression[n];
+            ArithmeticProgression[] arr = new ArithmeticProgression[count];
 
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < count; i++)
             {
-                Console.WriteLine($"\nПрогресія #{i + 1}:");
-                Console.Write("  Введіть a₀: ");
+                Console.WriteLine($"\nПрогресія #{i + 1}");
+
+                Console.Write("Введіть a0: ");
                 double a0 = double.Parse(Console.ReadLine());
-                Console.Write("  Введіть q: ");
-                double q = double.Parse(Console.ReadLine());
-                Console.Write("  Введіть n: ");
-                int count = int.Parse(Console.ReadLine());
 
-                arr[i] = new GeometricProgression(a0, q, count);
+                Console.Write("Введіть d: ");
+                double d = double.Parse(Console.ReadLine());
+
+                Console.Write("Введіть n: ");
+                int n = int.Parse(Console.ReadLine());
+
+                arr[i] = new ArithmeticProgression(a0, d, n);
             }
 
-            // Знаходимо прогресію з найбільшим останнім членом
-            GeometricProgression maxProg = arr[0];
-            foreach (var gp in arr)
+            // Пошук прогресії з найбільшою сумою
+            ArithmeticProgression maxProg = arr[0];
+
+            for (int i = 1; i < arr.Length; i++)
             {
-                if (gp.LastTerm() > maxProg.LastTerm())
-                    maxProg = gp;
+                if (arr[i].GetSum() > maxProg.GetSum())
+                {
+                    maxProg = arr[i];
+                }
             }
 
-            Console.WriteLine("\n--- Результати ---");
-            for (int i = 0; i < arr.Length; i++)
-            {
-                Console.WriteLine($"Прогресія #{i + 1}: {arr[i]}");
-                Console.WriteLine($"  Чи найбільший останній член: {arr[i].HasLargestLastTerm()}");
-            }
-
-            Console.WriteLine($"\nПрогресія з найбільшим останнім членом:\n{maxProg}");
+            Console.WriteLine("\nПрогресія з найбільшою сумою:");
+            Console.WriteLine(maxProg);
         }
     }
 
@@ -98,10 +97,11 @@ namespace LabWork
     {
         static void Main(string[] args)
         {
-            Result.Run();
+            Result result = new Result();
+            result.Run();
+
             Console.WriteLine("\nНатисніть будь-яку клавішу для виходу...");
             Console.ReadKey();
         }
     }
 }
-
