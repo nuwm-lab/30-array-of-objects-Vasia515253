@@ -1,18 +1,55 @@
 using System;
-using System.Linq;
+using System.Linq; // Потрібно для методу OrderByDescending (LINQ)
 
 namespace LabWork
 {
+    // Даний проект є шаблоном для виконання лабораторних робіт
+    // з курсу "Об'єктно-орієнтоване програмування та патерни проектування"
+
     /// <summary>
-    /// Клас, що представляє арифметичну прогресію.
+    /// Клас, що представляє Арифметичну Прогресію.
     /// Характеризується першим членом (a0), різницею (d) та кількістю членів (n).
     /// </summary>
     public class ArithmeticProgression
     {
-        // Приватні поля для зберігання стану об'єкта
-        private readonly double _firstTerm; // a0
-        private readonly double _difference; // d
-        private readonly int _numberOfTerms; // n
+        // Приватні поля (з префіксом _) для зберігання даних. Забезпечення інкапсуляції.
+        private readonly double _firstTerm;
+        private readonly double _difference;
+        private readonly int _termsCount;
+
+        /// <summary>
+        /// Властивість: Перший член прогресії (a0).
+        /// </summary>
+        public double FirstTerm => _firstTerm;
+
+        /// <summary>
+        /// Властивість: Різниця прогресії (d).
+        /// </summary>
+        public double Difference => _difference;
+
+        /// <summary>
+        /// Властивість: Кількість членів прогресії (n).
+        /// </summary>
+        public int TermsCount => _termsCount;
+
+        /// <summary>
+        /// Обчислювана властивість: Повертає суму прогресії.
+        /// Обчислюється автоматично при зверненні за формулою S = n/2 * (2*a0 + (n-1)*d).
+        /// </summary>
+        public double Sum
+        {
+            get
+            {
+                // Перевірка на випадок, якщо TermsCount була встановлена некоректно (хоча конструктор її вже перевіряє)
+                if (_termsCount <= 0)
+                {
+                    return 0;
+                }
+                
+                // Формула для суми арифметичної прогресії: S = n/2 * (2*a0 + (n-1)*d)
+                return (double)_termsCount / 2 * (2 * _firstTerm + (_termsCount - 1) * _difference);
+            }
+        }
 
         /// <summary>
         /// Конструктор для ініціалізації арифметичної прогресії.
@@ -24,155 +61,104 @@ namespace LabWork
         {
             if (n <= 0)
             {
+                // Ясне повідомлення про помилку
                 throw new ArgumentException("Кількість членів (n) повинна бути більшою за нуль.", nameof(n));
             }
 
             _firstTerm = a0;
             _difference = d;
-            _numberOfTerms = n;
-        }
-
-        // Властивості лише для читання, що забезпечують інкапсуляцію
-        public double FirstTerm => _firstTerm;
-        public double Difference => _difference;
-        public int NumberOfTerms => _numberOfTerms;
-
-        /// <summary>
-        /// Обчислює суму арифметичної прогресії за формулою:
-        /// S_n = n/2 * (2*a0 + (n-1)*d)
-        /// </summary>
-        /// <returns>Сума n членів прогресії.</returns>
-        public double CalculateSum()
-        {
-            // Формула для n-го члена: a_n = a0 + (n-1) * d
-            // Формула для суми: S_n = n/2 * (a0 + a_n)
-            // Або: S_n = n/2 * (2*a0 + (n-1)*d)
-            double sum = (double)_numberOfTerms / 2 * (2 * _firstTerm + (_numberOfTerms - 1) * _difference);
-            return sum;
+            _termsCount = n;
         }
 
         /// <summary>
-        /// Повертає текстове представлення об'єкта.
+        /// Перевизначений метод для зручного виведення параметрів прогресії.
         /// </summary>
         /// <returns>Рядок із параметрами прогресії та її сумою.</returns>
         public override string ToString()
         {
-            return $"A.P.: a0={_firstTerm}, d={_difference}, n={_numberOfTerms}, Sum={CalculateSum():F2}";
+            return $"A.P.: a0={FirstTerm:F2}, d={Difference:F2}, n={TermsCount}, Sum={Sum:F2}";
         }
     }
-    
-    // Результат - тепер цей клас містить логіку знаходження найбільшої суми.
+
+
     class Result
     {
+        // TODO: do it ! (Логіка реалізована в Main, але можна додати допоміжні методи сюди)
+    }
+
+    class Program
+    {
         /// <summary>
-        /// Створює масив об'єктів ArithmeticProgression з випадковими або заданими параметрами.
+        /// Допоміжний метод для генерації масиву прогресій.
         /// </summary>
-        /// <param name="count">Кількість прогресій для створення.</param>
+        /// <param name="count">Кількість прогресій.</param>
         /// <returns>Масив об'єктів ArithmeticProgression.</returns>
-        public static ArithmeticProgression[] CreateProgressionsArray(int count)
+        private static ArithmeticProgression[] CreateRandomProgressions(int count)
         {
-            // Це лише приклад для демонстрації.
-            // У реальній лабораторній роботі ви можете читати дані з файлу або вводу користувача.
-            
             var progressions = new ArithmeticProgression[count];
             var random = new Random();
 
             for (int i = 0; i < count; i++)
             {
-                // Генеруємо випадкові параметри
-                double a0 = random.Next(-10, 10) + random.NextDouble();
-                double d = random.Next(-5, 5) + random.NextDouble();
+                // Генеруємо випадкові параметри (a0, d - дійсні числа, n - ціле > 0)
+                double a0 = random.Next(-10, 11) + random.NextDouble();
+                double d = random.Next(-5, 6) + random.NextDouble();
                 int n = random.Next(3, 15); // Кількість членів від 3 до 14
 
                 progressions[i] = new ArithmeticProgression(a0, d, n);
             }
 
-            // Додамо одну прогресію з великою сумою для гарантованого результату
+            // Додамо одну прогресію з великою сумою для демонстрації максимального значення
             if (count > 0)
             {
-                progressions[0] = new ArithmeticProgression(100, 10, 10); // a0=100, d=10, n=10. S_10 = 10/2 * (2*100 + 9*10) = 5 * (200 + 90) = 1450
+                // a0=100, d=10, n=10. S_10 = 1450.00
+                progressions[0] = new ArithmeticProgression(100.0, 10.0, 10);
             }
-
 
             return progressions;
         }
 
-        /// <summary>
-        /// Знаходить прогресію з найбільшою сумою в масиві.
-        /// </summary>
-        /// <param name="progressions">Масив арифметичних прогресій.</param>
-        /// <returns>Об'єкт ArithmeticProgression з найбільшою сумою, або null, якщо масив порожній.</returns>
-        public static ArithmeticProgression FindProgressionWithMaxSum(ArithmeticProgression[] progressions)
-        {
-            if (progressions == null || progressions.Length == 0)
-            {
-                return null;
-            }
-            
-            // Використовуємо Linq для знаходження елемента з максимальним значенням функції (CalculateSum)
-            // Це ефективний та лаконічний спосіб
-            ArithmeticProgression maxSumProgression = progressions
-                .OrderByDescending(p => p.CalculateSum())
-                .FirstOrDefault();
 
-            return maxSumProgression;
-
-            /* Альтернативний (класичний) спосіб без Linq:
-            
-            ArithmeticProgression maxSumProgression = progressions[0];
-            double maxSum = maxSumProgression.CalculateSum();
-
-            for (int i = 1; i < progressions.Length; i++)
-            {
-                double currentSum = progressions[i].CalculateSum();
-                if (currentSum > maxSum)
-                {
-                    maxSum = currentSum;
-                    maxSumProgression = progressions[i];
-                }
-            }
-            return maxSumProgression;
-            */
-        }
-    }
-    
-    class Program
-    {
         static void Main(string[] args)
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            Console.WriteLine("🚀 Запуск лабораторної роботи: Арифметична прогресія");
-            Console.WriteLine("---");
-
-            // 1. Створити масив з n об’єктів класу "Арифметична прогресія".
-            int n = 5; // Кількість прогресій у масиві
-            ArithmeticProgression[] progressions = Result.CreateProgressionsArray(n);
+            Console.WriteLine("--- 🚀 Обчислення прогресій та пошук максимальної суми ---");
             
-            Console.WriteLine($"Створено {n} арифметичних прогресій:");
+            // 1. Прочитати (або створити) кількість прогресій m
+            const int m = 5;
+            Console.WriteLine($"Створення масиву з {m} арифметичних прогресій (випадкові дані):");
             
+            // 2. Створити масив/список розміру m і заповнити його екземплярами
+            ArithmeticProgression[] progressions = CreateRandomProgressions(m);
+            
+            Console.WriteLine("\nСтворені прогресії:");
             int counter = 1;
             foreach (var p in progressions)
             {
                 Console.WriteLine($"Прогресія #{counter++}: {p.ToString()}");
             }
             
-            Console.WriteLine("---");
+            Console.WriteLine("\n----------------------------------------------");
 
-            // 2. Знайти прогресію з найбільшою сумою.
-            ArithmeticProgression maxSumProgression = Result.FindProgressionWithMaxSum(progressions);
-
+            // 3. Знайти екземпляр з максимальною сумою (пройти по масиву, обчислити Sum і знайти max)
+            
+            // Використовуємо Linq для лаконічного пошуку прогресії з найбільшою Sum
+            // Примітка: Linq викличе властивість Sum (яка обчислює суму) для кожного елемента.
+            ArithmeticProgression maxSumProgression = progressions
+                .OrderByDescending(p => p.Sum) // Сортуємо за спаданням суми
+                .FirstOrDefault();             // Беремо перший (найбільший) елемент
+            
             if (maxSumProgression != null)
             {
-                Console.WriteLine("🏆 Прогресія з найбільшою сумою:");
+                Console.WriteLine("🏆 ЗНАЙДЕНО ПРОГРЕСІЮ З НАЙБІЛЬШОЮ СУМОЮ:");
                 Console.WriteLine(maxSumProgression.ToString());
             }
             else
             {
-                Console.WriteLine("Масив прогресій порожній.");
+                Console.WriteLine("Масив прогресій порожній або не вдалося знайти максимальну суму.");
             }
             
-            Console.WriteLine("---");
-            Console.WriteLine("Завершення програми.");
+            Console.WriteLine("\n--- Завершення роботи програми ---");
         }
     }
 }
