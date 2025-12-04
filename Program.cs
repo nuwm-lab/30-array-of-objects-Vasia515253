@@ -1,5 +1,5 @@
 using System;
-using System.Linq; 
+using System.Linq;
 using System.Collections.Generic;
 
 namespace LabWork
@@ -10,7 +10,7 @@ namespace LabWork
     /// Клас, що представляє Арифметичну Прогресію.
     /// Характеризується першим членом (a0), різницею (d) та кількістю членів (n).
     /// </summary>
-    public class ArithmeticProgression // PascalCase та явний public
+    public class ArithmeticProgression
     {
         // Приватні поля (інкапсуляція)
         private readonly double _first;
@@ -45,7 +45,7 @@ namespace LabWork
         /// Обчислює суму арифметичної прогресії за формулою: S = n*(2*a0 + (n-1)*d)/2.
         /// </summary>
         /// <returns>Сума n членів прогресії (double).</returns>
-        public double Sum() // PascalCase
+        public double Sum()
         {
             // Формула суми арифметичної прогресії
             double sum = (double)_count * (2 * _first + (_count - 1) * _difference) / 2;
@@ -62,24 +62,24 @@ namespace LabWork
         }
     }
 
-    // Клас Result залишаємо порожнім, як у початковому шаблоні
+    /// <summary>
+    /// Заглушка для можливих майбутніх результатів лабораторної роботи.
+    /// </summary>
     class Result
     {
         // TODO: do it !
     }
 
-    // Клас Program може бути статичним у .NET Core 6+ для спрощення, 
-    // але для сумісності та слідування шаблону залишаємо його звичайним.
-    public class Program
+    // Клас Program зроблено статичним, оскільки він містить лише статичні члени.
+    public static class Program 
     {
         /// <summary>
-        /// Допоміжний метод для безпечного зчитування double з консолі, обробляючи помилки парсингу.
+        /// Допоміжний метод для безпечного зчитування double з консолі.
         /// </summary>
         private static double ReadDouble(string prompt)
         {
-            double value; // camelCase для локальних змінних
+            double value;
             Console.Write(prompt);
-            // Перевірка парсингу вводу
             while (!double.TryParse(Console.ReadLine(), out value))
             {
                 Console.WriteLine("Помилка вводу. Будь ласка, введіть дійсне число.");
@@ -93,9 +93,8 @@ namespace LabWork
         /// </summary>
         private static int ReadInt(string prompt)
         {
-            int value; // camelCase
+            int value;
             Console.Write(prompt);
-            // Перевірка парсингу та граничних значень (n > 0)
             while (!int.TryParse(Console.ReadLine(), out value) || value <= 0)
             {
                 Console.WriteLine("Помилка вводу. Будь ласка, введіть ціле число, БІЛЬШЕ за 0.");
@@ -114,55 +113,63 @@ namespace LabWork
             Console.WriteLine("-------------------------------------------------------------------");
 
             // 1. Прочитати розмір масиву (кількість прогресій)
-            int progressionCount = 0;
+            int totalProgressionsToCreate = 0;
             try
             {
-                progressionCount = ReadInt("Введіть кількість прогресій (m > 0): ");
+                totalProgressionsToCreate = ReadInt("Введіть кількість прогресій (m > 0), які ви хочете створити: ");
             }
             catch (Exception)
             {
-                 // Запобігаємо необробленим виключенням на рівні Main
                  Console.WriteLine("Кількість прогресій не була введена коректно. Завершення.");
                  return;
             }
             
-            // Створення List для динамічного зберігання об'єктів
             var progressions = new List<ArithmeticProgression>();
             
-            // 2. Наповнення масиву/списку, читаючи a0, d, n для кожної прогресії
-            for (int i = 0; i < progressionCount; i++)
+            // 2. Наповнення масиву/списку
+            for (int i = 0; i < totalProgressionsToCreate; i++)
             {
                 Console.WriteLine($"\n--- Введення параметрів для прогресії #{i + 1} ---");
                 try
                 {
                     double a0 = ReadDouble($"Введіть перший член a0: ");
                     double d = ReadDouble($"Введіть різницю d: ");
-                    int n = ReadInt($"Введіть кількість членів n (n > 0): ");
+                    // Тут викликаємо ReadInt, який гарантує n > 0
+                    int n = ReadInt($"Введіть кількість членів n (n > 0): "); 
                     
-                    // Створення та додавання об'єкта
                     progressions.Add(new ArithmeticProgression(a0, d, n));
                 }
                 catch (ArgumentException ex)
                 {
-                    // Обробка помилок (якщо ReadInt не спрацював, або інша помилка валідації)
+                    // Обробка помилок валідації конструктора
                     Console.WriteLine($"Помилка валідації: {ex.Message}. Створення прогресії #{i + 1} пропущено.");
+                    // НЕ ЗМЕНШУЄМО totalProgressionsToCreate, але об'єкт не додається в progressions.
                 }
             }
             
             Console.WriteLine("\n-------------------------------------------------------------------");
-            Console.WriteLine($"Збережено {progressionCount} прогресій. Обчислення сум...");
+            
+            // ВИПРАВЛЕНО: Виводимо реальну кількість успішно доданих об'єктів
+            Console.WriteLine($"Створено та збережено {progressions.Count} прогресій з {totalProgressionsToCreate} спроб. Обчислення сум...");
 
-            if (progressionCount == 0 || progressions.Count == 0)
+            if (progressions.Count == 0)
             {
                 Console.WriteLine("Немає прогресій для аналізу.");
                 return;
             }
 
+            // Вивід усіх прогресій для перевірки
+            Console.WriteLine("\nСтворені прогресії:");
+            int counter = 1;
+            foreach (var p in progressions)
+            {
+                Console.WriteLine($"Прогресія #{counter++}: {p.ToString()}");
+            }
+
             // 3. Пошук прогресії з максимальною сумою (використовуємо LINQ)
-            // Використання LINQ.OrderByDescending().First() є чистим і сучасним способом для .NET 5.0.
             ArithmeticProgression maxSumProgression = progressions
-                .OrderByDescending(p => p.Sum()) // Сортуємо за спаданням результату методу Sum()
-                .FirstOrDefault();                // Беремо перший елемент
+                .OrderByDescending(p => p.Sum()) 
+                .FirstOrDefault();
 
             // 4. Виведення результату
             Console.WriteLine("\n-------------------------------------------------------------------");
