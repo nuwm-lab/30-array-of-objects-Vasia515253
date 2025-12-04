@@ -2,56 +2,53 @@ using System;
 
 namespace LabWork
 {
-    class ArithmeticProgression
+    public class ArithmeticProgression
     {
-        // --- Поля (приватні для інкапсуляції) ---
-        private double firstTerm;
-        private double difference;
-        private int numberOfTerms;
+        private double _firstTerm;
+        private double _difference;
+        private int _numberOfTerms;
 
-        // --- Властивості ---
         public double FirstTerm
         {
-            get => firstTerm;
-            set => firstTerm = value;
+            get => _firstTerm;
+            set => _firstTerm = value;
         }
 
         public double Difference
         {
-            get => difference;
-            set => difference = value;
+            get => _difference;
+            set => _difference = value;
         }
 
         public int NumberOfTerms
         {
-            get => numberOfTerms;
+            get => _numberOfTerms;
             set
             {
                 if (value <= 0)
-                    throw new ArgumentException("Number of terms must be > 0");
-                numberOfTerms = value;
+                {
+                    throw new ArgumentException("Number of terms must be greater than 0");
+                }
+                _numberOfTerms = value;
             }
         }
 
-        // --- Конструктор ---
-        public ArithmeticProgression(double a0, double d, int n)
+        public ArithmeticProgression(double firstTerm, double difference, int numberOfTerms)
         {
-            FirstTerm = a0;
-            Difference = d;
-            NumberOfTerms = n;
+            FirstTerm = firstTerm;
+            Difference = difference;
+            NumberOfTerms = numberOfTerms;
         }
 
-        // --- Метод для обчислення суми прогресії ---
-        public double GetSum()
+        public double Sum()
         {
-            // S = n/2 * (2a0 + (n - 1)*d)
-            return numberOfTerms / 2.0 * (2 * firstTerm + (numberOfTerms - 1) * difference);
+            // Формула суми арифметичної прогресії
+            return _numberOfTerms * (2 * _firstTerm + (_numberOfTerms - 1) * _difference) / 2.0;
         }
 
-        // Для виводу
         public override string ToString()
         {
-            return $"a0 = {firstTerm}, d = {difference}, n = {numberOfTerms}, sum = {GetSum()}";
+            return $"a0 = {FirstTerm}, d = {Difference}, n = {NumberOfTerms}, Sum = {Sum()}";
         }
     }
 
@@ -60,38 +57,39 @@ namespace LabWork
         static void Main(string[] args)
         {
             Console.Write("Enter number of progressions: ");
-            int n = int.Parse(Console.ReadLine());
+            int k = int.Parse(Console.ReadLine());
 
-            ArithmeticProgression[] arr = new ArithmeticProgression[n];
+            ArithmeticProgression[] progressions = new ArithmeticProgression[k];
 
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < k; i++)
             {
                 Console.WriteLine($"\nProgression {i + 1}:");
 
-                Console.Write("a0 = ");
+                Console.Write("Enter first term (a0): ");
                 double a0 = double.Parse(Console.ReadLine());
 
-                Console.Write("d = ");
+                Console.Write("Enter difference (d): ");
                 double d = double.Parse(Console.ReadLine());
 
-                Console.Write("n = ");
-                int terms = int.Parse(Console.ReadLine());
+                Console.Write("Enter number of terms (n): ");
+                int n = int.Parse(Console.ReadLine());
 
-                arr[i] = new ArithmeticProgression(a0, d, terms);
+                progressions[i] = new ArithmeticProgression(a0, d, n);
             }
 
-            // Знаходження з максимальною сумою
-            ArithmeticProgression maxProg = arr[0];
+            // Пошук прогресії з найбільшою сумою
+            ArithmeticProgression maxProg = progressions[0];
 
-            foreach (var prog in arr)
+            foreach (var prog in progressions)
             {
-                if (prog.GetSum() > maxProg.GetSum())
+                if (prog.Sum() > maxProg.Sum())
+                {
                     maxProg = prog;
+                }
             }
 
-            Console.WriteLine("\nProgression with MAX sum:");
+            Console.WriteLine("\nProgression with the largest sum:");
             Console.WriteLine(maxProg);
         }
     }
 }
-
