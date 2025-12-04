@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
-using System.Collections.Generic; // Для використання List<T>
+using System.Linq; // Використовується для OrderByDescending
+using System.Collections.Generic; // Використовується для List<T>
 
 namespace LabWork
 {
@@ -10,17 +10,17 @@ namespace LabWork
     /// Клас, що представляє Арифметичну Прогресію.
     /// Характеризується першим членом (a0), різницею (d) та кількістю членів (n).
     /// </summary>
-    public class ArithmeticProgression // PascalCase та явний public
+    public class ArithmeticProgression // PascalCase
     {
-        // Приватні поля для зберігання даних. Забезпечення інкапсуляції.
+        // Приватні поля (інкапсуляція)
         private readonly double _firstTerm;
         private readonly double _difference;
-        private readonly int _length;
+        private readonly int _count;
 
         // Властивості (PascalCase) лише для читання
         public double FirstTerm => _firstTerm;
         public double Difference => _difference;
-        public int Length => _length; // Використовуємо Length замість TermsCount/n
+        public int Count => _count;
 
         /// <summary>
         /// Конструктор для ініціалізації арифметичної прогресії.
@@ -30,75 +30,75 @@ namespace LabWork
         /// <param name="n">Кількість членів прогресії (int). Має бути > 0.</param>
         public ArithmeticProgression(double a0, double d, int n)
         {
-            // Перевірка граничних значень та обробка помилок
+            // Обробка граничних випадків: n<=0
             if (n <= 0)
             {
-                // Кидаємо ArgumentException з ясним повідомленням
-                throw new ArgumentException("Кількість членів прогресії (Length) повинна бути більшою за нуль.", nameof(n));
+                // Повідомлення про помилкові дані
+                throw new ArgumentException("Кількість членів (Count) повинна бути більшою за нуль.", nameof(n));
             }
 
             _firstTerm = a0;
             _difference = d;
-            _length = n;
+            _count = n;
         }
 
         /// <summary>
         /// Обчислює суму арифметичної прогресії за формулою: S = n*(2*a0 + (n-1)*d)/2.
         /// </summary>
         /// <returns>Сума n членів прогресії (double).</returns>
-        public double CalculateSum() // PascalCase
+        public double Sum() // Метод Sum()
         {
-            // Формула суми арифметичної прогресії: S = n*(2*a0 + (n-1)*d)/2
-            double sum = (double)_length * (2 * _firstTerm + (_length - 1) * _difference) / 2;
+            // Використовуємо формулу: sum = n*(2*a0 + (n-1)*d)/2
+            double sum = (double)_count * (2 * _firstTerm + (_count - 1) * _difference) / 2;
             return sum;
         }
 
         /// <summary>
         /// Перевизначений метод для читабельного виводу параметрів прогресії та її суми.
         /// </summary>
-        /// <returns>Рядок із параметрами прогресії та її сумою.</returns>
+        /// <returns>Рядок із параметрами прогресії та обчисленою сумою.</returns>
         public override string ToString()
         {
-            return $"A.P.: a0={FirstTerm:F2}, d={Difference:F2}, n={Length}, Sum={CalculateSum():F2}";
+            return $"A.P.: a0={FirstTerm:F2}, d={Difference:F2}, n={Count}, Sum={Sum():F2}";
         }
     }
 
 
     class Result
     {
-        // TODO: do it ! (Логіка реалізована в Program.Main)
+        // Клас залишаємо як заглушку, як у початковому шаблоні
     }
 
     class Program
     {
         /// <summary>
-        /// Допоміжний метод для генерації списку прогресій із випадковими значеннями.
+        /// Допоміжний метод для безпечного зчитування double з консолі.
         /// </summary>
-        /// <param name="count">Кількість прогресій.</param>
-        /// <returns>Список об'єктів ArithmeticProgression.</returns>
-        private static List<ArithmeticProgression> CreateRandomProgressions(int count)
+        private static double ReadDouble(string prompt)
         {
-            var progressions = new List<ArithmeticProgression>();
-            var random = new Random();
-
-            for (int i = 0; i < count; i++)
+            double value;
+            Console.Write(prompt);
+            while (!double.TryParse(Console.ReadLine(), out value))
             {
-                // Генеруємо випадкові параметри
-                double a0 = random.Next(-10, 11) + random.NextDouble();
-                double d = random.Next(-5, 6) + random.NextDouble();
-                int n = random.Next(3, 15); // Кількість членів від 3 до 14
-
-                // Додаємо новий об'єкт
-                progressions.Add(new ArithmeticProgression(a0, d, n));
+                Console.WriteLine("Помилка вводу. Будь ласка, введіть дійсне число.");
+                Console.Write(prompt);
             }
+            return value;
+        }
 
-            // Додамо одну прогресію з великою сумою для гарантованого результату
-            if (count > 0)
+        /// <summary>
+        /// Допоміжний метод для безпечного зчитування int з консолі.
+        /// </summary>
+        private static int ReadInt(string prompt)
+        {
+            int value;
+            Console.Write(prompt);
+            while (!int.TryParse(Console.ReadLine(), out value) || value <= 0)
             {
-                progressions[0] = new ArithmeticProgression(200.0, 5.0, 10); // S_10 = 2125.00
+                Console.WriteLine("Помилка вводу. Будь ласка, введіть ціле число, більше за 0.");
+                Console.Write(prompt);
             }
-
-            return progressions;
+            return value;
         }
 
 
@@ -108,38 +108,69 @@ namespace LabWork
             Console.WriteLine("--- 🚀 Лабораторна робота: Арифметична прогресія (Пошук Max Суми) ---");
             Console.WriteLine("-------------------------------------------------------------------");
             
-            // 1. Створити масив/List заданого розміру
-            const int progressionCount = 6;
-            Console.WriteLine($"Створення списку з {progressionCount} арифметичних прогресій (випадкові дані):");
+            // 1. Запит у користувача кількості прогресій m
+            int m = ReadInt("Введіть кількість прогресій (m > 0): ");
             
-            // Заповнення списку екземплярами
-            List<ArithmeticProgression> progressions = CreateRandomProgressions(progressionCount);
+            // Створення List для динамічного зберігання об'єктів
+            var progressions = new List<ArithmeticProgression>();
             
-            Console.WriteLine("\nСтворені прогресії (a0, d, n та обчислена Sum):");
-            int counter = 1;
-            foreach (var p in progressions)
+            // 2. Зчитування параметрів та створення об'єктів
+            for (int i = 0; i < m; i++)
             {
-                Console.WriteLine($"Прогресія #{counter++}: {p.ToString()}");
+                Console.WriteLine($"\n--- Введення параметрів для прогресії #{i + 1} ---");
+                try
+                {
+                    double a0 = ReadDouble($"Введіть перший член a0 (Прогресія #{i + 1}): ");
+                    double d = ReadDouble($"Введіть різницю d (Прогресія #{i + 1}): ");
+                    int n = ReadInt($"Введіть кількість членів n (n > 0, Прогресія #{i + 1}): ");
+                    
+                    // Створення та додавання об'єкта
+                    progressions.Add(new ArithmeticProgression(a0, d, n));
+                }
+                catch (ArgumentException ex)
+                {
+                    // Обробка помилок (хоча ReadInt вже перевіряє n>0)
+                    Console.WriteLine($"Помилка: {ex.Message}. Прогресія #{i + 1} пропущена.");
+                    i--; // Повторити ітерацію для коректної кількості
+                }
+            }
+            
+            Console.WriteLine("\n-------------------------------------------------------------------");
+            Console.WriteLine($"Введено {progressions.Count} коректних прогресій. Обчислення сум...");
+
+            if (progressions.Count == 0)
+            {
+                Console.WriteLine("Немає прогресій для аналізу.");
+                return;
+            }
+
+            // 3. Знаходження прогресії з найбільшою сумою (традиційний спосіб)
+            ArithmeticProgression maxSumProgression = progressions[0];
+            double maxSum = maxSumProgression.Sum();
+            
+            Console.WriteLine("\nДетальний вивід прогресій та пошук максимуму:");
+
+            for (int i = 0; i < progressions.Count; i++)
+            {
+                var currentProgression = progressions[i];
+                double currentSum = currentProgression.Sum();
+                
+                // Вивід поточної прогресії (ToString)
+                Console.WriteLine($"Прогресія #{i + 1}: {currentProgression.ToString()}");
+
+                // Порівняння для знаходження найбільшої суми
+                if (currentSum > maxSum)
+                {
+                    maxSum = currentSum;
+                    maxSumProgression = currentProgression;
+                }
             }
             
             Console.WriteLine("\n-------------------------------------------------------------------");
 
-            // 2. Знайти прогресію з максимальною сумою, порівнюючи значення Sum()
-            
-            // Використовуємо Linq OrderByDescending для .NET 5.0 або нижче.
-            ArithmeticProgression maxSumProgression = progressions
-                .OrderByDescending(p => p.CalculateSum()) // Сортуємо за спаданням результату методу CalculateSum()
-                .FirstOrDefault();                         // Беремо перший (найбільший) елемент
-            
-            if (maxSumProgression != null)
-            {
-                Console.WriteLine("🏆 ЗНАЙДЕНО ПРОГРЕСІЮ З НАЙБІЛЬШОЮ СУМОЮ:");
-                Console.WriteLine(maxSumProgression.ToString());
-            }
-            else
-            {
-                Console.WriteLine("Список прогресій порожній.");
-            }
+            // 4. Виведення результату
+            Console.WriteLine("🏆 ПРОГРЕСІЯ З НАЙБІЛЬШОЮ СУМОЮ:");
+            Console.WriteLine(maxSumProgression.ToString());
             
             Console.WriteLine("\n--- Завершення роботи програми ---");
         }
