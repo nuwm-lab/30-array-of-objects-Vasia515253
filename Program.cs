@@ -4,6 +4,7 @@ namespace LabWork
 {
     public class ArithmeticProgression
     {
+        //sdkgjdsfgj
         private double _firstTerm;
         private double _difference;
         private int _numberOfTerms;
