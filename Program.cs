@@ -4,51 +4,38 @@ namespace LabWork
 {
     public class ArithmeticProgression
     {
-        private double _firstTerm;
-        private double _difference;
-        private int _count;
+        public double A0 { get; set; }
+        public double D { get; set; }
+        private int _n;
 
-        public double FirstTerm
+        public int N
         {
-            get => _firstTerm;
-            set => _firstTerm = value;
-        }
-
-        public double Difference
-        {
-            get => _difference;
-            set => _difference = value;
-        }
-
-        public int Count
-        {
-            get => _count;
+            get => _n;
             set
             {
                 if (value <= 0)
                 {
-                    throw new ArgumentException("Count (n) must be greater than 0.");
+                    throw new ArgumentException("N must be greater than 0.");
                 }
-                _count = value;
+                _n = value;
             }
         }
 
-        public ArithmeticProgression(double firstTerm, double difference, int count)
+        public ArithmeticProgression(double a0, double d, int n)
         {
-            FirstTerm = firstTerm;
-            Difference = difference;
-            Count = count;
+            A0 = a0;
+            D = d;
+            N = n;
         }
 
         public double Sum()
         {
-            // Формула: S = n * (2*a0 + (n - 1) * d) / 2
-            return Count * (2 * FirstTerm + (Count - 1) * Difference) / 2.0;
+            return N * (2 * A0 + (N - 1) * D) / 2.0;
         }
 
         public override string ToString()
         {
-            return $"a0 = {FirstTerm}, d = {Difference}, n = {Count}, Sum = {Sum()}";
+            return $"A0 = {A0}, D = {D}, N = {N}, Sum = {Sum()}";
         }
     }
 
@@ -57,43 +44,39 @@ namespace LabWork
         static void Main(string[] args)
         {
             Console.Write("Enter number of progressions: ");
-            int size = int.Parse(Console.ReadLine());
+            int count = int.Parse(Console.ReadLine());
 
-            ArithmeticProgression[] arr = new ArithmeticProgression[size];
+            ArithmeticProgression[] progressions = new ArithmeticProgression[count];
 
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < count; i++)
             {
-                Console.WriteLine($"\nProgression #{i + 1}:");
+                Console.WriteLine($"\nProgression #{i + 1}");
 
-                Console.Write("Enter first term (a0): ");
+                Console.Write("Enter A0: ");
                 double a0 = double.Parse(Console.ReadLine());
 
-                Console.Write("Enter difference (d): ");
+                Console.Write("Enter D: ");
                 double d = double.Parse(Console.ReadLine());
 
-                Console.Write("Enter number of terms (n): ");
+                Console.Write("Enter N: ");
                 int n = int.Parse(Console.ReadLine());
 
-                arr[i] = new ArithmeticProgression(a0, d, n);
+                progressions[i] = new ArithmeticProgression(a0, d, n);
             }
 
-            // Пошук прогресії з максимальною сумою
-            int maxIndex = 0;
-            double maxSum = arr[0].Sum();
+            // пошук максимальної суми
+            ArithmeticProgression maxProg = progressions[0];
 
-            for (int i = 1; i < size; i++)
+            for (int i = 1; i < count; i++)
             {
-                double currentSum = arr[i].Sum();
-                if (currentSum > maxSum)
+                if (progressions[i].Sum() > maxProg.Sum())
                 {
-                    maxSum = currentSum;
-                    maxIndex = i;
+                    maxProg = progressions[i];
                 }
             }
 
             Console.WriteLine("\nProgression with the largest sum:");
-            Console.WriteLine(arr[maxIndex]);
+            Console.WriteLine(maxProg);
         }
     }
 }
-
