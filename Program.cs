@@ -26,9 +26,7 @@ namespace LabWork
             set
             {
                 if (value <= 0)
-                {
                     throw new ArgumentException("Number of terms must be greater than 0");
-                }
                 _numberOfTerms = value;
             }
         }
@@ -42,7 +40,6 @@ namespace LabWork
 
         public double Sum()
         {
-            // Формула суми арифметичної прогресії
             return _numberOfTerms * (2 * _firstTerm + (_numberOfTerms - 1) * _difference) / 2.0;
         }
 
@@ -63,12 +60,12 @@ namespace LabWork
 
             for (int i = 0; i < k; i++)
             {
-                Console.WriteLine($"\nProgression {i + 1}:");
+                Console.WriteLine($"\nProgression #{i + 1}:");
 
-                Console.Write("Enter first term (a0): ");
+                Console.Write("Enter the first term (a0): ");
                 double a0 = double.Parse(Console.ReadLine());
 
-                Console.Write("Enter difference (d): ");
+                Console.Write("Enter the difference (d): ");
                 double d = double.Parse(Console.ReadLine());
 
                 Console.Write("Enter number of terms (n): ");
@@ -77,15 +74,12 @@ namespace LabWork
                 progressions[i] = new ArithmeticProgression(a0, d, n);
             }
 
-            // Пошук прогресії з найбільшою сумою
             ArithmeticProgression maxProg = progressions[0];
 
             foreach (var prog in progressions)
             {
                 if (prog.Sum() > maxProg.Sum())
-                {
                     maxProg = prog;
-                }
             }
 
             Console.WriteLine("\nProgression with the largest sum:");
